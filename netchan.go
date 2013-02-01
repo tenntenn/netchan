@@ -3,29 +3,17 @@ package netchan
 import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
-	msgpack "github.com/ugorji/go-msgpack"
 	"net"
 	"net/http"
 	"net/url"
 	"reflect"
 )
 
-func msgpackMarshal(v interface{}) (msg []byte, payloadType byte, err error) {
-	msg, err = msgpack.Marshal(v, nil)
-	return msg, websocket.BinaryFrame, err
-}
-
-func msgpackUnmarshal(msg []byte, payloadType byte, v interface{}) (err error) {
-	return msgpack.Unmarshal(msg, v, nil)
-}
-
 var (
-	Codec    = websocket.Codec{msgpackMarshal, msgpackUnmarshal}
+	// A Codec which is used for serialize and deserialize.
+	Codec = websocket.Codec{msgpackMarshal, msgpackUnmarshal}
+	// Protocol of websocket handshaking.
 	Protocol = "http"
-)
-
-var (
-	Done = fmt.Errorf("Done chan")
 )
 
 type connMap struct {
@@ -39,10 +27,13 @@ func newConnMap() *connMap {
 	return &connMap{handlers, serveMux}
 }
 
+// netchan mapper.
+// It map from channels to remote channels by address and channel name.
 type NetChan struct {
 	connMap_ map[string]*connMap
 }
 
+// Create new netchan mapper.
 func New() *NetChan {
 	connMap_ := make(map[string]*connMap)
 	return &NetChan{connMap_}
@@ -148,6 +139,12 @@ func (self *NetChan) Dial(ch interface{}, done chan<- bool, dst, src, name strin
 // Default netchan mapper.
 var defaultNetChan = New()
 
+// Connect remote channel by given name.
+// ch is conecting channel to remote one.
+// if you use ch by sending data and response from remote host,
+// you can recieve true from done channel.
+// dst and src are address of serving netchan and remote netchan such as "<hostname>:<port number>".
+// The function returns a channel and you can get error by the channel
 func Dial(ch interface{}, done chan<- bool, dst, src, name string) (errCh <-chan error) {
 	return defaultNetChan.Dial(ch, done, dst, src, name)
 }
