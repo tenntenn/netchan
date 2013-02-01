@@ -11,7 +11,7 @@ select {
 	case err := <-Dial(&ch, done, ":9090", ":8080", "Test"):
 		fmt.Println(err.Error())
 	case ch <- 100:
-			<-done
+		<-done
 }
 ```
 
