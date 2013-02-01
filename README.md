@@ -1,6 +1,8 @@
 netchan
 ==============
 
+An implementation of netchan using websocket and messagepack.
+
 API document is [here](http://godoc.org/github.com/tenntenn/netchan).
 
 Send
