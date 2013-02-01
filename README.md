@@ -1,6 +1,8 @@
 netchan
 ==============
 
+API document is [here](http://godoc.org/github.com/tenntenn/netchan).
+
 Send
 --------
 
