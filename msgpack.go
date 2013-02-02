@@ -8,7 +8,7 @@ import (
 // marshal into messagepack.
 // This function is used for websocket.Codec.
 func msgpackMarshal(v interface{}) (msg []byte, payloadType byte, err error) {
-	msg, err = msgpack.Marshal(v, nil)
+	msg, err = msgpack.Marshal(v)
 	return msg, websocket.BinaryFrame, err
 }
 
