@@ -19,33 +19,11 @@ func init() {
 	flag.Parse()
 }
 
-func recieve(closed chan bool) {
-
-	ch := make(chan string)
-	fmt.Printf("recieve: %sto%s\n", *remoteHost, *ownHost)
-	errCh := netchan.Dial(&ch, nil, *ownHost, *remoteHost, *remoteHost +"to"+*ownHost)
-
-	for {
-		select {
-		case err := <-errCh:
-			if err != nil {
-				closed <- true
-				return
-			}
-		case msg := <-ch:
-			fmt.Println("Remote say: ", msg)
-		case <-closed:
-			return
-		}
-	}
-}
-
-func send(closed chan bool) {
+func run(closed chan bool) {
 
 	ch := make(chan string)
 	done := make(chan bool)
-	fmt.Printf("send: %sto%s\n", *ownHost, *remoteHost)
-	errCh := netchan.Dial(&ch, nil, *ownHost, *remoteHost, *ownHost + "to" + *remoteHost)
+	errCh := netchan.Dial(&ch, nil, *ownHost, *remoteHost, "chat")
 	r := bufio.NewReader(os.Stdin)
 	for {
 		select {
@@ -54,6 +32,8 @@ func send(closed chan bool) {
 				closed <- true
 				return
 			}
+		case msg := <-ch:
+			fmt.Println("Remote host says: ", msg)
 		case <-closed:
 			return
 		default:
@@ -65,25 +45,20 @@ func send(closed chan bool) {
 				continue
 			}
 			ch <- string(msg)
-			fmt.Println("hoge")
 			select {
 			case <-done:
 				fmt.Println("You said: ", msg)
 			case <-time.After(time.Duration(5) * time.Second):
 				fmt.Println("time out")
 				closed <- true
-				return
+				break
 			}
 		}
 	}
 }
 
-func run() {
-	closed := make(chan bool)
-	go recieve(closed)
-	send(closed)
-}
-
 func main() {
-	run()
+	closed := make(chan bool)
+	go run(closed)
+	<-closed
 }
