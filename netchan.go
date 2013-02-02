@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
+	"encoding/base64"
 	"reflect"
 )
 
@@ -88,7 +88,7 @@ func (self *NetChan) Dial(ch interface{}, done chan<- bool, dst, src, name strin
 				Codec.Send(ws, true)
 			}
 		}
-		path := fmt.Sprintf("/%s", url.QueryEscape(name))
+		path := fmt.Sprintf("/%s", base64.URLEncoding.EncodeToString([]byte(name)))
 		connMap_.handlers[name] = path
 		connMap_.serveMux.Handle(path, websocket.Handler(handler))
 
