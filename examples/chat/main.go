@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/tenntenn/netchan"
+	//"github.com/tenntenn/netchan"
+	"../../../netchan"
 	"bufio"
 	"os"
 	"time"
@@ -23,7 +24,7 @@ func run(closed chan bool) {
 
 	ch := make(chan string)
 	done := make(chan bool)
-	errCh := netchan.Dial(&ch, nil, *ownHost, *remoteHost, "chat")
+	errCh := netchan.Dial(&ch, done, *ownHost, *remoteHost, "chat")
 	r := bufio.NewReader(os.Stdin)
 	for {
 		select {
